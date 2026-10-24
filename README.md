@@ -31,5 +31,6 @@ The reports distinguish user-provided context, assumptions, proposed designs, an
 
 ## Release and Commit
 
+- Repository: https://github.com/rishiakkaraju05/HKAIVERSE
 - Release tag: `v1.0.0`
-- Final commit URL: **Add the full GitHub commit URL after the final commit is pushed.**
+- Final commit URL: https://github.com/rishiakkaraju05/HKAIVERSE/commit/7781cafce021342f5e0e26505d6ad014ceeb7cd5
