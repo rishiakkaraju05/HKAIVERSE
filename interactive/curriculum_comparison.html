@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curriculum and Job Skills Comparison</title>
+<style>
+  :root { color-scheme: light; --ink:#202938; --muted:#596579; --line:#d8dee8; --panel:#f5f7fb; --accent:#2458a6; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:#fff; }
+  main { max-width:1100px; margin:0 auto; padding:28px 18px 48px; }
+  h1 { line-height:1.2; margin-bottom:8px; font-size:clamp(1.7rem,3vw,2.4rem); }
+  h2 { margin-top:32px; font-size:1.35rem; }
+  p { max-width:80ch; }
+  .muted { color:var(--muted); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; padding:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:22px 0; }
+  label { display:block; font-weight:650; margin-bottom:5px; }
+  select,input { font:inherit; width:100%; padding:9px 10px; border:1px solid #aeb8c8; border-radius:7px; background:white; color:inherit; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:16px 0; }
+  .stat { border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .stat strong { display:block; font-size:1.45rem; }
+  .stat span { color:var(--muted); font-size:.9rem; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+  table { border-collapse:collapse; width:100%; min-width:760px; }
+  th,td { text-align:left; padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:var(--panel); font-size:.92rem; }
+  tr:last-child td { border-bottom:0; }
+  .tag { display:inline-block; border-radius:999px; padding:2px 9px; background:#e8edf5; font-size:.82rem; white-space:nowrap; }
+  .tag.practical { background:#dff3e7; }
+  .tag.concept { background:#fff0cf; }
+  .tag.self { background:#e8e2ff; }
+  .calculator { border:1px solid var(--line); border-radius:12px; padding:18px; margin-top:18px; }
+  .calc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+  .result { margin-top:14px; padding:14px; background:var(--panel); border-radius:8px; }
+  button { margin-top:12px; padding:10px 14px; font:inherit; border:0; border-radius:8px; background:var(--accent); color:#fff; cursor:pointer; }
+  button:focus,select:focus,input:focus { outline:3px solid #9ebcf2; outline-offset:2px; }
+  .note { border-left:4px solid var(--accent); padding:10px 14px; background:var(--panel); margin-top:18px; }
+  footer { margin-top:34px; color:var(--muted); font-size:.9rem; }
+  @media (max-width:600px) { main { padding:20px 12px 36px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>My Curriculum vs. Job Skills</h1>
+  <p class="muted">B.Tech CSE (AI) · Seven semesters completed · A student-led comparison of coursework, practical experience, and skills I want to develop.</p>
+  <p>This tool lets me filter subjects and role requirements, compare my current experience with job expectations, and calculate a proposed credit change. Credit values below are only placeholders for planning; I have not entered my university’s official credit values.</p>
+
+  <section class="controls" aria-label="Comparison filters">
+    <div>
+      <label for="role">Job role</label>
+      <select id="role">
+        <option value="all">All three roles</option>
+        <option value="analyst">Data Analyst</option>
+        <option value="ml">AI/ML Engineer</option>
+        <option value="fullstack">Full Stack Developer</option>
+      </select>
+    </div>
+    <div>
+      <label for="semester">Semester</label>
+      <select id="semester">
+        <option value="all">All semesters (1–7)</option>
+        <option value="1">Semester 1</option><option value="2">Semester 2</option>
+        <option value="3">Semester 3</option><option value="4">Semester 4</option>
+        <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        <option value="7">Semester 7</option>
+      </select>
+    </div>
+    <div>
+      <label for="experience">Experience type</label>
+      <select id="experience">
+        <option value="all">All experience types</option>
+        <option value="practical">Practical coursework/lab</option>
+        <option value="concept">Concepts/theory learned</option>
+        <option value="self">Learned independently</option>
+        <option value="develop">Want to develop further</option>
+      </select>
+    </div>
+    <div>
+      <label for="search">Search subject or skill</label>
+      <input id="search" type="search" placeholder="e.g. SQL, AWS, GenAI">
+    </div>
+  </section>
+
+  <section class="stats" aria-live="polite">
+    <div class="stat"><strong id="shown">0</strong><span>Rows shown</span></div>
+    <div class="stat"><strong>3</strong><span>Job roles compared</span></div>
+    <div class="stat"><strong>7</strong><span>Semesters reviewed</span></div>
+    <div class="stat"><strong>4</strong><span>Experience categories</span></div>
+  </section>
+
+  <h2>Coursework and experience comparison</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Semester / subject</th><th>Role relevance</th><th>What I learned or practised</th><th>Experience</th><th>Next step</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p id="empty" class="muted" hidden>No rows match these filters. Try another role, semester, or search term.</p>
+
+  <h2>Proposed credit-change calculator</h2>
+  <p>Use this as a planning aid when proposing curriculum changes. Replace the example numbers with official credits from the programme structure before submitting. The calculator does not assume that the semester unit totals you supplied are credit values.</p>
+  <section class="calculator">
+    <div class="calc-grid">
+      <div><label for="total">Official programme credits</label><input id="total" type="number" min="1" step="1" placeholder="Enter official total"></div>
+      <div><label for="change">Credits changed / redesigned</label><input id="change" type="number" min="0" step="0.5" placeholder="Enter proposed amount"></div>
+      <div><label for="target">Target share (%)</label><input id="target" type="number" min="1" max="100" step="1" value="22"></div>
+    </div>
+    <button id="calculate" type="button">Calculate proposed share</button>
+    <div class="result" id="result" aria-live="polite">Enter the official total credits and the number of credits affected, then calculate.</div>
+  </section>
+
+  <div class="note"><strong>My current conclusions</strong><br>
+  I have practised basic Excel in the DWV lab, used Python and Matplotlib in Google Colab, completed practical ML exercises, used AWS through college exercises, and applied HTML, CSS, and JavaScript. I learned Generative AI and Big Data Systems concepts without practical lab sessions. I learned API concepts and Git independently. I have not used Power BI yet.</div>
+
+  <footer>Prepared for the curriculum-audit assignment. Job-role labels summarize the three job descriptions in my comparison document. This interactive page is a working draft and should be checked against the final report and official programme credit structure.</footer>
+</main>
+<script>
+const data = [
+ {s:1, subject:"C Programming", roles:["ml","fullstack"], what:"Programming fundamentals and problem-solving practice.", type:"practical", label:"Practical coursework", next:"Build confidence with more coding exercises and debugging."},
+ {s:1, subject:"Linear Algebra and Ordinary Differential Equations", roles:["analyst","ml"], what:"Mathematical foundations used in quantitative analysis and ML.", type:"concept", label:"Concepts/theory", next:"Practise applied statistics and quantitative interpretation with datasets."},
+ {s:2, subject:"Data Structures in C", roles:["ml","fullstack"], what:"Data structures and programming foundations.", type:"practical", label:"Practical coursework", next:"Practise problem-solving and algorithmic questions."},
+ {s:2, subject:"Introduction to AI and DS", roles:["analyst","ml"], what:"Introductory AI and data-science concepts.", type:"concept", label:"Concepts/theory", next:"Connect concepts to small, documented projects."},
+ {s:3, subject:"Object Oriented Programming Concepts", roles:["ml","fullstack"], what:"OOP concepts, alongside Python basics and exception handling learned in programming study.", type:"practical", label:"Coursework/practice", next:"Use OOP in a small maintainable application."},
+ {s:3, subject:"Database Management Systems", roles:["analyst","ml","fullstack"], what:"Database concepts and SQL foundations.", type:"practical", label:"Coursework", next:"Practise realistic SQL queries, joins, and data tasks."},
+ {s:3, subject:"Machine Learning Mathematics", roles:["analyst","ml"], what:"Mathematical foundation for machine learning.", type:"concept", label:"Concepts/theory", next:"Apply quantitative concepts to model evaluation."},
+ {s:4, subject:"Industry Coding Practice (Python/R)", roles:["analyst","ml","fullstack"], what:"Python basics, OOP concepts, and exception handling.", type:"practical", label:"Coursework/practice", next:"Create a project with clean code, tests, and Git."},
+ {s:4, subject:"Web-Enabled Technologies", roles:["ml","fullstack"], what:"Applied web-development learning with HTML, CSS, and JavaScript.", type:"practical", label:"Practical application", next:"Build a small responsive web application."},
+ {s:4, subject:"Operating Systems", roles:["ml","fullstack"], what:"Operating-system concepts and computing foundations.", type:"concept", label:"Concepts/theory", next:"Relate concepts to development and deployment workflows."},
+ {s:5, subject:"Data Wrangling and Visualization (DWV)", roles:["analyst","ml"], what:"Basic Excel practised in the lab; Python and Matplotlib visualizations in Google Colab.", type:"practical", label:"Practical lab", next:"Practise advanced spreadsheet work and dashboard creation."},
+ {s:5, subject:"Machine Learning", roles:["ml","analyst"], what:"Different ML models and practical lab exercises.", type:"practical", label:"Practical lab", next:"Document model selection, metrics, and error analysis."},
+ {s:5, subject:"Predictive Analytics", roles:["analyst","ml"], what:"Predictive-analysis concepts and related model work.", type:"practical", label:"Coursework/labs", next:"Build a reproducible analysis using a real dataset."},
+ {s:6, subject:"Big Data Systems", roles:["ml","analyst"], what:"Learned big-data concepts; no practical lab sessions in this subject.", type:"concept", label:"Concepts/theory", next:"Gain hands-on practice processing larger datasets."},
+ {s:6, subject:"Deep Learning", roles:["ml"], what:"Deep-learning concepts and models as part of AI/ML study.", type:"concept", label:"Coursework", next:"Build on ML practice with a documented deep-learning exercise."},
+ {s:7, subject:"Generative AI", roles:["ml"], what:"Learned different types of generative models and how they work; no practical GenAI lab sessions.", type:"concept", label:"Concepts/theory", next:"Build and evaluate a small GenAI application."},
+ {s:7, subject:"Cloud Computing", roles:["ml","fullstack","analyst"], what:"Hands-on AWS experience and college exercises.", type:"practical", label:"Practical exercises", next:"Deploy an application and document its operation."},
+ {s:7, subject:"Computer Vision", roles:["ml"], what:"Computer-vision subject knowledge within the AI curriculum.", type:"concept", label:"Coursework", next:"Use a small image dataset for a documented project."},
+ {s:0, subject:"API concepts (self-learning)", roles:["ml","fullstack"], what:"Learned API concepts independently; no dedicated API subject in the curriculum.", type:"self", label:"Self-taught", next:"Build an API and connect it to a front end or ML model."},
+ {s:0, subject:"Git (self-learning)", roles:["ml","fullstack"], what:"Learned Git independently; no dedicated Git subject in the curriculum.", type:"self", label:"Self-taught", next:"Use branches, commits, and pull-request-style review in projects."},
+ {s:0, subject:"Power BI / dedicated dashboard tool", roles:["analyst"], what:"Have not used Power BI or another dedicated dashboard tool yet.", type:"develop", label:"Want to develop", next:"Create a dashboard from a cleaned dataset."},
+ {s:0, subject:"GenAI application / RAG practice", roles:["ml"], what:"Conceptual knowledge of generative models, without practical GenAI lab sessions.", type:"develop", label:"Want to develop", next:"Build a small retrieval-based app and evaluate its output."},
+ {s:0, subject:"Big-data practical processing", roles:["ml","analyst"], what:"Studied Big Data Systems concepts but did not have practical lab sessions.", type:"develop", label:"Want to develop", next:"Try a hands-on exercise with a larger dataset."},
+ {s:0, subject:"End-to-end application project", roles:["ml","fullstack","analyst"], what:"Bring together existing skills in a project rather than treating each subject separately.", type:"develop", label:"Want to develop", next:"Plan data or app workflow, version control, tests, and deployment."}
+];
+const roleNames = {analyst:"Data Analyst", ml:"AI/ML Engineer", fullstack:"Full Stack Developer"};
+const tbody = document.getElementById("rows");
+function render(){
+ const role = document.getElementById("role").value;
+ const sem = document.getElementById("semester").value;
+ const exp = document.getElementById("experience").value;
+ const q = document.getElementById("search").value.trim().toLowerCase();
+ const filtered = data.filter(d =>
+   (role==="all" || d.roles.includes(role)) &&
+   (sem==="all" || String(d.s)===sem) &&
+   (exp==="all" || d.type===exp) &&
+   (!q || [d.subject,d.what,d.next,d.label].join(" ").toLowerCase().includes(q))
+ );
+ tbody.innerHTML = filtered.map(d => {
+   const semLabel = d.s===0 ? "Independent / future" : "Semester "+d.s;
+   const roleLabel = role==="all" ? d.roles.map(r=>roleNames[r]).join(", ") : roleNames[role];
+   const tagClass = d.type==="practical" ? "practical" : d.type==="concept" ? "concept" : d.type==="self" ? "self" : "";
+   return `<tr><td><strong>${escapeHtml(d.subject)}</strong><br><span class="muted">${semLabel}</span></td><td>${escapeHtml(roleLabel)}</td><td>${escapeHtml(d.what)}</td><td><span class="tag ${tagClass}">${escapeHtml(d.label)}</span></td><td>${escapeHtml(d.next)}</td></tr>`;
+ }).join("");
+ document.getElementById("shown").textContent = filtered.length;
+ document.getElementById("empty").hidden = filtered.length!==0;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+["role","semester","experience","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",render));
+document.getElementById("calculate").addEventListener("click",()=>{
+ const total=Number(document.getElementById("total").value);
+ const changed=Number(document.getElementById("change").value);
+ const target=Number(document.getElementById("target").value);
+ const out=document.getElementById("result");
+ if(!Number.isFinite(total)||!Number.isFinite(changed)||!Number.isFinite(target)||total<=0||changed<0||changed>total||target<=0||target>100){
+   out.textContent="Please enter a positive official total, a changed-credit amount between zero and the total, and a target between 1% and 100%.";
+   return;
+ }
+ const share=changed/total*100;
+ const targetCredits=total*target/100;
+ const diff=changed-targetCredits;
+ out.innerHTML=`<strong>Proposed share: ${share.toFixed(1)}%</strong><br>Target: ${target}% (${targetCredits.toFixed(1)} credits).<br>${Math.abs(diff)<0.0001?"The proposed amount matches the target.":diff>0?`The proposed change is ${diff.toFixed(1)} credits above the target.`:`The proposed change is ${(Math.abs(diff)).toFixed(1)} credits below the target.`}<br><span class="muted">This is a planning calculation only. Use official programme credits and confirm institutional rules before finalizing.</span>`;
+});
+render();
+</script>
+</body>
+</html>
